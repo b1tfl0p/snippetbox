@@ -1,7 +1,7 @@
 {
   "overrides": [
     {
-      "files": "*.tmpl",
+      "files": "*.gotmpl",
       "options": { "parser": "html" }
     }
   ]
