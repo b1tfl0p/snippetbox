@@ -4,23 +4,30 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 )
 
 func (app *application) routes() http.Handler {
-	mux := http.NewServeMux()
+	router := httprouter.New()
 
-	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static")})
-	mux.Handle("/static", http.NotFoundHandler())
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	router.NotFound = http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			app.notFound(w)
+		})
 
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet/view", app.snippetView)
-	mux.HandleFunc("/snippet/create", app.snippetCreate)
+	router.ServeFiles(
+		"/static/*filepath",
+		neuteredFileSystem{http.Dir("./ui/static")},
+	)
+
+	router.HandlerFunc(http.MethodGet, "/", app.home)
+	router.HandlerFunc(http.MethodGet, "/snippet/view/:id", app.snippetView)
+	router.HandlerFunc(http.MethodGet, "/snippet/create", app.snippetCreate)
+	router.HandlerFunc(http.MethodPost, "/snippet/create", app.snippetCreatePost)
 
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
-
-	return standard.Then(mux)
+	return standard.Then(router)
 }
 
 type neuteredFileSystem struct {
