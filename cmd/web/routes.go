@@ -18,7 +18,7 @@ func (app *application) routes() http.Handler {
 	nfs := neuteredFileSystem{http.Dir("./ui/static")}
 	router.ServeFiles("/static/*filepath", nfs)
 
-	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
 	router.Handler(http.MethodGet, "/snippet/view/:id", dynamic.ThenFunc(app.snippetView))
