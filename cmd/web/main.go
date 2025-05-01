@@ -22,6 +22,7 @@ type application struct {
 	errorLog       *log.Logger
 	infoLog        *log.Logger
 	snippets       *models.SnippetModel
+	users          *models.UserModel
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
@@ -58,6 +59,7 @@ func main() {
 		errorLog:       errorLog,
 		infoLog:        infoLog,
 		snippets:       &models.SnippetModel{DB: db},
+		users:          &models.UserModel{DB: db},
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
@@ -66,8 +68,6 @@ func main() {
 	tlsConfig := &tls.Config{
 		// Prefer to use only elliptic curves with assembly implementations:
 		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-		MinVersion:       tls.VersionTLS12,
-		// Will affect TLS 1.0 - 1.2 ONLY:
 		CipherSuites: []uint16{
 			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
