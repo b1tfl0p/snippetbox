@@ -2,8 +2,7 @@ package mocks
 
 import "github.com/b1tfl0p/snippetbox/internal/models"
 
-type UserModel struct {
-}
+type UserModel struct{}
 
 func (m *UserModel) Insert(name, email, password string) error {
 	switch email {
@@ -15,7 +14,7 @@ func (m *UserModel) Insert(name, email, password string) error {
 }
 
 func (m *UserModel) Authenticate(email, password string) (int, error) {
-	if email == "alice@exapmle.com" && password == "pa$$word" {
+	if email == "alice@example.com" && password == "pa$$word" {
 		return 1, nil
 	}
 
