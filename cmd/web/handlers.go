@@ -251,3 +251,11 @@ func (app *application) accountView(w http.ResponseWriter, r *http.Request) {
 	data.User = user
 	app.render(w, http.StatusOK, "account.gotmpl", data)
 }
+
+func (app *application) accountPasswordUpdate(w http.ResponseWriter, r *http.Request) {
+	// TODO
+}
+
+func (app *application) accountPasswordUpdatePost(w http.ResponseWriter, r *http.Request) {
+	// TODO
+}
