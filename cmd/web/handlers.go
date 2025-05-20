@@ -252,7 +252,7 @@ func (app *application) accountView(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "account.gotmpl", data)
 }
 
-type changePasswordForm struct {
+type accountPasswordUpdateForm struct {
 	CurrentPassword         string `form:"currentPassword"`
 	NewPassword             string `form:"newPassword"`
 	NewPasswordConfirmation string `form:"newPasswordConfirmation"`
@@ -261,10 +261,31 @@ type changePasswordForm struct {
 
 func (app *application) accountPasswordUpdate(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
-	data.Form = changePasswordForm{}
+	data.Form = accountPasswordUpdateForm{}
+
 	app.render(w, http.StatusOK, "password.gotmpl", data)
 }
 
 func (app *application) accountPasswordUpdatePost(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	var form accountPasswordUpdateForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.CurrentPassword), "currentPassword", "This field cannot be blank")
+	form.CheckField(validator.NotBlank(form.NewPassword), "newPassword", "This field cannot be blank")
+	form.CheckField(validator.MinChars(form.NewPassword, 8), "newPassword", "This field must be at least 8 characters long")
+	form.CheckField(validator.NotBlank(form.NewPasswordConfirmation), "newPasswordConfirmation", "This field cannot be blank")
+	form.CheckField(form.NewPassword == form.NewPasswordConfirmation, "newPasswordConfirmation", "Passwords do not match")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+
+		app.render(w, http.StatusUnprocessableEntity, "password.gotmpl", data)
+		return
+	}
 }
